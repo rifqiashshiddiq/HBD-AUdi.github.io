@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <title>HEY SEMOGA SEMAKIN BAIK YAA</title>
+    <meta charset="UTF-8">
+    <meta name="description" content=" ngucapin lu ultah sambil latihan koding">
+    <meta name="author" content="dorut & fadwa">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: medium;
+            text-align: center;
+            text-justify: auto;
+            background-color: cornsilk;
+        }
+        #playButton, #candle, #instructions {
+            display: inline-block;
+            vertical-align: middle;
+
+            margin-bottom: 20px;
+        }
+        #volumeBar {
+            width: 100px;
+            height: 1750px;
+            background-color: #ccc;
+            margin: 0 auto;
+        }
+        #volumeLevel {
+            height: 100%;
+            background-color: rgb(242, 96, 24);
+        }
+    </style>
+</head>
+<body>
+    <h1> HAI-iiiiii 👋🏼</h1>
+    <p> hari ini ulang tahunmu 🎂</p>
+    <p> sebelum lanjut ucap banyak doa dihatimu <br>
+        boleh berbisik asal khusyuk saja <br>
+        berdoa yang banyak jangan sungkan <br>
+        kami tidak keberatan menunggu
+    </p>
+    <p>doa sudah dipanjatkan ?<br>
+    </p>
+    <button id="playButton"> Sudah! </button>
+    <div id="candle" style="display: none;">
+        <div id="flame">
+            <img width=100 height="100" src="https://cdn.pixabay.com/animation/2023/10/23/14/28/14-28-15-523_512.gif">
+        </div>
+    </div>
+    <p id="instructions" style="display: none;">Silahkan tiup lilinya🕯️🕯️,<br> biar kami bantu Aamiiinkan 🤲🏼🤲🏼</p>
+    <div id="volumeBar">
+        <div id="volumeLevel"></div>
+    </div>
+
+    <script>
+        let isPlaying = false;
+
+        function startListening() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function(stream) {
+                const audioContext = new AudioContext();
+                const analyser = audioContext.createAnalyser();
+                const microphone = audioContext.createMediaStreamSource(stream);
+                const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+
+                analyser.smoothingTimeConstant = 0.3;
+                analyser.fftSize = 1024;
+
+                microphone.connect(analyser);
+                analyser.connect(javascriptNode);
+                javascriptNode.connect(audioContext.destination);
+
+                javascriptNode.onaudioprocess = function() {
+                    const array = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(array);
+                    let values = 0;
+
+                    const length = array.length;
+                    for (let i = 0; i < length; i++) {
+                        values += array[i];
+                    }
+
+                    const average = values / length;
+                    // Update tinggi bar indikator suara
+                    const volumeLevel = document.getElementById('volumeLevel');
+                    volumeLevel.style.height = average + 'px';
+
+                    // Deteksi suara tiupan (misalnya, jika rata-rata nilai frekuensi cukup tinggi)
+                    if (average > 100) {
+                        window.location.href = 'Halamanutama.html'; // Redirect ke halaman lain
+                    }
+                }
+            })
+            .catch(function(err) {
+                console.error('Error accessing microphone:', err);
+            });
+        }
+
+        document.getElementById('playButton').addEventListener('click', function() {
+            if (!isPlaying) {
+                startListening();
+                isPlaying = true;
+                document.getElementById('candle').style.display = 'block';
+                document.getElementById('instructions').style.display = 'block';
+                document.getElementById('playButton').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
